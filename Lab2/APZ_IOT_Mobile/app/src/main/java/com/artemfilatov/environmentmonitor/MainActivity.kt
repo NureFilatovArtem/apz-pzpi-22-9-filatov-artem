@@ -6,7 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.artemfilatov.environmentmonitor.data.repository.MeasurementRepository
-import com.artemfilatov.environmentmonitor.ui.navigation.AppNavGraph
+import com.artemfilatov.environmentmonitor.ui.navigation.NavGraph
 import com.artemfilatov.environmentmonitor.ui.theme.Enviroment_ApplicationTheme
 import com.artemfilatov.environmentmonitor.utils.RetrofitInstance
 import com.artemfilatov.environmentmonitor.viewmodel.MainViewModel
@@ -30,7 +30,7 @@ class MainActivity : ComponentActivity() {
                     )
                 )
 
-                AppNavGraph(navController = navController, viewModel = viewModel)
+                NavGraph(navController = navController, viewModel = viewModel)
             }
         }
     }
