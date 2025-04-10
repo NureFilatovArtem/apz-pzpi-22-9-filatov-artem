@@ -1,3 +1,4 @@
+// 📦 Імпорти
 package com.artemfilatov.environmentmonitor.ui.navigation
 
 import androidx.compose.runtime.*
@@ -16,8 +17,6 @@ import com.artemfilatov.environmentmonitor.viewmodel.OverviewViewModel
 import com.artemfilatov.environmentmonitor.viewmodel.OverviewViewModelFactory
 import com.artemfilatov.environmentmonitor.viewmodel.EntityViewModelFactory
 import com.artemfilatov.environmentmonitor.utils.RetrofitInstance
-import com.artemfilatov.environmentmonitor.ui.entity.EntityViewModel
-
 
 @Composable
 fun NavGraph(
@@ -52,7 +51,6 @@ fun NavGraph(
         // 🟢 OVERVIEW
         composable("overview") {
             val overviewVM: OverviewViewModel = viewModel(factory = OverviewViewModelFactory(RetrofitInstance.api))
-
             val offices = overviewVM.offices.collectAsState().value
             val buildings = overviewVM.buildings.collectAsState().value
             val sensors = overviewVM.sensors.collectAsState().value
@@ -84,15 +82,13 @@ fun NavGraph(
                 title = "Офіси",
                 entityType = "office",
                 items = entityVM.offices.map { it.name },
-                onDelete = { name -> entityVM.deleteOfficeByName(name) },
-                onEdit = { name ->
-                    val office = entityVM.offices.find { it.name == name["name"] }
-                    office?.let {
-                        val fields = mapOf("name" to it.name, "buildingId" to it.buildingId)
-                        entityVM.editOffice(it.id, fields)
-                    }
+                onDelete = { fields -> fields["name"]?.let { entityVM.deleteOfficeByName(it) } },
+                onEdit = { fields ->
+                    val name = fields["name"] ?: return@EntityListScreen
+                    val office = entityVM.offices.find { it.name == name }
+                    office?.let { entityVM.editOffice(it.id, fields) }
                 },
-                onCreateEntity = { fields -> entityVM.createOffice(fields) }
+                onCreateEntity = { entityVM.createOffice(it) }
             )
         }
 
@@ -105,15 +101,13 @@ fun NavGraph(
                 title = "Будівлі",
                 entityType = "building",
                 items = entityVM.buildings.map { it.name },
-                onDelete = { name -> entityVM.deleteBuildingByName(name) },
-                onEdit = { name ->
-                    val building = entityVM.buildings.find { it.name == name["name"] }
-                    building?.let {
-                        val fields = mapOf("name" to it.name, "address" to it.address)
-                        entityVM.editBuilding(it.id, fields)
-                    }
+                onDelete = { fields -> fields["name"]?.let { entityVM.deleteBuildingByName(it) } },
+                onEdit = { fields ->
+                    val name = fields["name"] ?: return@EntityListScreen
+                    val building = entityVM.buildings.find { it.name == name }
+                    building?.let { entityVM.editBuilding(it.id, fields) }
                 },
-                onCreateEntity = { fields -> entityVM.createBuilding(fields) }
+                onCreateEntity = { entityVM.createBuilding(it) }
             )
         }
 
@@ -126,19 +120,13 @@ fun NavGraph(
                 title = "Сенсори",
                 entityType = "sensor",
                 items = entityVM.sensors.map { "ID: ${it.id}, Type: ${it.type}" },
-                onDelete = { id -> entityVM.deleteSensorById(id) },
-                onEdit = { id ->
-                    val sensorId = entityVM.extractIdSafe(id.toString()) // ✅ тут твоя функція
-                    val sensor = entityVM.sensors.find { it.id == sensorId }
-                    sensor?.let {
-                        val fields = mapOf(
-                            "type" to it.type,
-                            "officeId" to it.officeId.toString()
-                        )
-                        entityVM.editSensorById(sensorId, fields)
-                    }
+                onDelete = { fields -> fields["type"]?.let { entityVM.deleteSensorById(it) } },
+                onEdit = { fields ->
+                    val id = fields["type"]?.let { entityVM.extractIdSafe("ID: $it,") } ?: return@EntityListScreen
+                    val sensor = entityVM.sensors.find { it.id == id }
+                    sensor?.let { entityVM.editSensorById(sensor.id, fields) }
                 },
-                onCreateEntity = { fields -> entityVM.createSensor(fields) }
+                onCreateEntity = { entityVM.createSensor(it) }
             )
         }
 
@@ -149,19 +137,13 @@ fun NavGraph(
 
             SubscriptionListScreen(
                 subscriptions = entityVM.subscriptions,
-                onDelete = { id -> entityVM.deleteSubscriptionBySensorId(id) },
-                onEdit = { id ->
-                    val subId = id.substringAfter("Sensor ID: ").substringBefore(",").trim()
-                    val subscription = entityVM.subscriptions.find { it.sensor_id.toString() == subId }
-                    subscription?.let {
-                        val fields = mapOf(
-                            "sensor_id" to it.sensor_id.toString(),
-                            "callback_url" to it.callback_url
-                        )
-                        entityVM.editSubscription(subId, fields)
-                    }
+                onDelete = { fields -> fields["sensor_id"]?.let { entityVM.deleteSubscription(it) } },
+                onEdit = { fields ->
+                    val id = fields["sensor_id"] ?: return@SubscriptionListScreen
+                    val sub = entityVM.subscriptions.find { it.sensor_id.toString() == id }
+                    sub?.let { entityVM.editSubscription(id, fields) }
                 },
-                onCreateEntity = { fields -> entityVM.createSubscriptionFromFields(fields) }
+                onCreateEntity = { entityVM.createSubscriptionFromFields(it) }
             )
         }
     }
