@@ -1,77 +1,46 @@
-// 📦 Імпорти
 package com.artemfilatov.environmentmonitor.ui.navigation
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.artemfilatov.environmentmonitor.ui.entity.EntityListScreen
+import com.artemfilatov.environmentmonitor.ui.entity.EntityViewModel
 import com.artemfilatov.environmentmonitor.ui.history.HistoryScreen
 import com.artemfilatov.environmentmonitor.ui.login.LoginScreen
 import com.artemfilatov.environmentmonitor.ui.main.CurrentScreen
 import com.artemfilatov.environmentmonitor.ui.main.MainScreen
-import com.artemfilatov.environmentmonitor.ui.overview.DataOverviewScreen
-import com.artemfilatov.environmentmonitor.ui.entity.*
-import com.artemfilatov.environmentmonitor.viewmodel.MainViewModel
+import com.artemfilatov.environmentmonitor.utils.RetrofitInstance
+import com.artemfilatov.environmentmonitor.viewmodel.EntityViewModelFactory
 import com.artemfilatov.environmentmonitor.viewmodel.OverviewViewModel
 import com.artemfilatov.environmentmonitor.viewmodel.OverviewViewModelFactory
-import com.artemfilatov.environmentmonitor.viewmodel.EntityViewModelFactory
-import com.artemfilatov.environmentmonitor.utils.RetrofitInstance
 
 @Composable
-fun NavGraph(
-    navController: NavHostController,
-    viewModel: MainViewModel
-) {
+fun NavGraph(navController: NavHostController) {
     NavHost(navController = navController, startDestination = "login") {
 
-        // 🟢 LOGIN
         composable("login") {
-            LoginScreen(
-                onLoginSuccess = {
-                    navController.navigate("main") {
-                        popUpTo("login") { inclusive = true }
-                    }
-                }
-            )
+            LoginScreen(onLoginSuccess = { navController.navigate("main") })
         }
 
-        // 🟢 MAIN
         composable("main") {
             MainScreen(navController)
         }
 
-        // 🟢 CURRENT
         composable("current") {
-            LaunchedEffect(Unit) { viewModel.loadLatestMeasurements() }
-            val data = viewModel.latestMeasurements.collectAsState().value
-            CurrentScreen(latestMeasurements = data)
+            val overviewVM: OverviewViewModel = viewModel(factory = OverviewViewModelFactory(
+                RetrofitInstance.api))
+            CurrentScreen(overviewVM)
         }
 
-        // 🟢 OVERVIEW
-        composable("overview") {
-            val overviewVM: OverviewViewModel = viewModel(factory = OverviewViewModelFactory(RetrofitInstance.api))
-            val offices = overviewVM.offices.collectAsState().value
-            val buildings = overviewVM.buildings.collectAsState().value
-            val sensors = overviewVM.sensors.collectAsState().value
-
-            LaunchedEffect(Unit) {
-                overviewVM.loadAll()
-                viewModel.loadLatestMeasurements()
-            }
-
-            DataOverviewScreen(
-                buildings = buildings,
-                offices = offices,
-                sensors = sensors,
-                onRefresh = { overviewVM.loadAll() }
-            )
-        }
-
-        // 🟢 HISTORY
         composable("history") {
             HistoryScreen()
         }
+
+        // === ENTITY ROUTES ===
 
         // 🏢 OFFICES
         composable("offices") {
@@ -81,13 +50,9 @@ fun NavGraph(
             EntityListScreen(
                 title = "Офіси",
                 entityType = "office",
-                items = entityVM.offices.map { it.name },
-                onDelete = { fields -> fields["name"]?.let { entityVM.deleteOfficeByName(it) } },
-                onEdit = { fields ->
-                    val name = fields["name"] ?: return@EntityListScreen
-                    val office = entityVM.offices.find { it.name == name }
-                    office?.let { entityVM.editOffice(it.id, fields) }
-                },
+                items = entityVM.offices.map { mapOf("id" to it.id.toString(), "name" to it.name, "buildingId" to it.buildingId.toString()) },
+                onDelete = { fields -> fields["id"]?.toIntOrNull()?.let { entityVM.deleteOffice(it) } },
+                onEdit = { fields -> fields["id"]?.toIntOrNull()?.let { entityVM.editOffice(it, fields) } },
                 onCreateEntity = { entityVM.createOffice(it) }
             )
         }
@@ -100,13 +65,9 @@ fun NavGraph(
             EntityListScreen(
                 title = "Будівлі",
                 entityType = "building",
-                items = entityVM.buildings.map { it.name },
-                onDelete = { fields -> fields["name"]?.let { entityVM.deleteBuildingByName(it) } },
-                onEdit = { fields ->
-                    val name = fields["name"] ?: return@EntityListScreen
-                    val building = entityVM.buildings.find { it.name == name }
-                    building?.let { entityVM.editBuilding(it.id, fields) }
-                },
+                items = entityVM.buildings.map { mapOf("id" to it.id.toString(), "name" to it.name, "address" to it.address) },
+                onDelete = { fields -> fields["id"]?.toIntOrNull()?.let { entityVM.deleteBuilding(it) } },
+                onEdit = { fields -> fields["id"]?.toIntOrNull()?.let { entityVM.editBuilding(it, fields) } },
                 onCreateEntity = { entityVM.createBuilding(it) }
             )
         }
@@ -119,13 +80,9 @@ fun NavGraph(
             EntityListScreen(
                 title = "Сенсори",
                 entityType = "sensor",
-                items = entityVM.sensors.map { "ID: ${it.id}, Type: ${it.type}" },
-                onDelete = { fields -> fields["type"]?.let { entityVM.deleteSensorById(it) } },
-                onEdit = { fields ->
-                    val id = fields["type"]?.let { entityVM.extractIdSafe("ID: $it,") } ?: return@EntityListScreen
-                    val sensor = entityVM.sensors.find { it.id == id }
-                    sensor?.let { entityVM.editSensorById(sensor.id, fields) }
-                },
+                items = entityVM.sensors.map { mapOf("id" to it.id.toString(), "type" to it.type, "officeId" to it.officeId?.toString().orEmpty()) },
+                onDelete = { fields -> fields["id"]?.toIntOrNull()?.let { entityVM.deleteSensor(it) } },
+                onEdit = { fields -> fields["id"]?.toIntOrNull()?.let { entityVM.editSensor(it, fields) } },
                 onCreateEntity = { entityVM.createSensor(it) }
             )
         }
@@ -135,14 +92,12 @@ fun NavGraph(
             val entityVM: EntityViewModel = viewModel(factory = EntityViewModelFactory(RetrofitInstance.api))
             LaunchedEffect(Unit) { entityVM.loadSubscriptions() }
 
-            SubscriptionListScreen(
-                subscriptions = entityVM.subscriptions,
-                onDelete = { fields -> fields["sensor_id"]?.let { entityVM.deleteSubscription(it) } },
-                onEdit = { fields ->
-                    val id = fields["sensor_id"] ?: return@SubscriptionListScreen
-                    val sub = entityVM.subscriptions.find { it.sensor_id.toString() == id }
-                    sub?.let { entityVM.editSubscription(id, fields) }
-                },
+            EntityListScreen(
+                title = "🔔 Підписки",
+                entityType = "subscription",
+                items = entityVM.subscriptions.map { mapOf("id" to it.sensor_id.toString(), "sensor_id" to it.sensor_id.toString(), "callback_url" to it.callback_url) },
+                onDelete = { fields -> fields["id"]?.toIntOrNull()?.let { entityVM.deleteSubscription(it) } },
+                onEdit = { fields -> fields["id"]?.toIntOrNull()?.let { entityVM.editSubscription(it, fields) } },
                 onCreateEntity = { entityVM.createSubscriptionFromFields(it) }
             )
         }

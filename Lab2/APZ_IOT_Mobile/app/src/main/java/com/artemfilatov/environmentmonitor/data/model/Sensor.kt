@@ -1,7 +1,7 @@
 package com.artemfilatov.environmentmonitor.data.model
 
 data class Sensor(
-    val id: String,
+    val id: Int,
     val type: String,
-    val officeId: String? = null // ← nullable
+    val officeId: Int? = null
 )
