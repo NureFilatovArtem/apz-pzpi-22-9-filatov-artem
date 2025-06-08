@@ -16,3 +16,8 @@ logs.txt
 .node_modules/*
 .node_modules/
 .node_modules/  
+
+.idea
+gradle
+/build
+/reso
