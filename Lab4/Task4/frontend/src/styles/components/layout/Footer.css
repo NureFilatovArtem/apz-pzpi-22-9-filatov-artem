@@ -1,0 +1,8 @@
+/* src/components/layout/Footer.css */
+.app-footer {
+    background-color: #1c2833; /* Even darker for footer */
+    color: #bdc3c7; /* Light grey text */
+    text-align: center;
+    padding: 20px;
+    font-size: 0.9em;
+  }

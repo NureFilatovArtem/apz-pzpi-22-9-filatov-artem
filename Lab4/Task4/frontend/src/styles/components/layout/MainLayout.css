@@ -1,0 +1,12 @@
+/* src/components/layout/MainLayout.css */
+.main-layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  .main-content {
+    flex: 1; /* Takes up all available space between header and footer */
+    padding: 20px; /* Add some padding around the content */
+    /* You might want to limit max-width and center it here or in #root from global.css */
+  }

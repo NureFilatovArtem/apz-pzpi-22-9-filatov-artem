@@ -1,0 +1,17 @@
+.admin-layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  .admin-layout-content-wrapper {
+    display: flex;
+    flex-grow: 1; /* Щоб ця частина розтягувалася між хедером і футером */
+    background-color: #f4f7f6; /* Фон для основного контенту, як було в global.css */
+  }
+  
+  .admin-main-content {
+    flex-grow: 1; /* Щоб займав весь простір праворуч від сайдбару */
+    padding: 25px;
+    overflow-y: auto; /* Додає скрол, якщо контенту багато */
+  }

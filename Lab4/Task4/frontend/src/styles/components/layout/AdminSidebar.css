@@ -1,0 +1,41 @@
+/* src/styles/components/admin/layout/AdminSidebar.css */
+.admin-sidebar {
+    width: 240px; /* Або інша ширина за вашим бажанням */
+    background-color: #2c3e50; /* Той самий колір, що й хедер, або трохи світліший/темніший */
+    color: #ecf0f1;
+    padding: 20px 0; /* Падінг зверху/знизу, без бокового, оскільки це зробить `ul` */
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* Щоб займав всю доступну висоту в своєму flex-контейнері */
+  }
+  
+  .admin-sidebar nav {
+    width: 100%;
+  }
+  
+  .admin-sidebar ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .admin-sidebar ul li a {
+    display: block;
+    color: #ecf0f1;
+    text-decoration: none;
+    padding: 12px 20px; /* Падінг для кожного елемента */
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+    border-left: 3px solid transparent; /* Для індикації активного стану */
+  }
+  
+  .admin-sidebar ul li a:hover {
+    background-color: #34495e; /* Трохи світліший фон при наведенні */
+    color: #ffffff;
+  }
+  
+  .admin-sidebar ul li a.active-link {
+    background-color: #1abc9c; /* Яскравий колір для активного посилання */
+    color: #ffffff;
+    font-weight: bold;
+    border-left: 3px solid #f1c40f; /* Жовтий акцент */
+  }

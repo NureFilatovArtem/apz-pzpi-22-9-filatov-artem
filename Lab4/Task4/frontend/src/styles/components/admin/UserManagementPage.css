@@ -1,0 +1,94 @@
+.user-management-page {
+    padding: 20px;
+  }
+  
+  .user-management-page .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 15px;
+  }
+  
+  .user-management-page .page-header h1 {
+    font-size: 1.8em;
+    color: #333;
+    margin: 0;
+  }
+  
+  .user-management-page .add-user-btn {
+    background-color: #27ae60; /* Зелений */
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.95em;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+  }
+  
+  .user-management-page .add-user-btn:hover {
+    background-color: #229954;
+  }
+  
+  .users-table {
+    width: 100%;
+    border-collapse: collapse;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    border-radius: 5px;
+    overflow: hidden; /* Щоб border-radius застосовувався до таблиці */
+  }
+  
+  .users-table th,
+  .users-table td {
+    border-bottom: 1px solid #e0e0e0;
+    padding: 12px 15px;
+    text-align: left;
+    vertical-align: middle;
+  }
+  
+  .users-table th {
+    background-color: #f8f9fa; /* Дуже світло-сірий для заголовків */
+    color: #495057;
+    font-weight: 600;
+    font-size: 0.9em;
+    text-transform: uppercase;
+  }
+  
+  .users-table tbody tr:hover {
+    background-color: #f1f3f5; /* Світлий фон при наведенні на рядок */
+  }
+  
+  .users-table .action-btn {
+    padding: 6px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.85em;
+    margin-right: 5px;
+    transition: opacity 0.2s ease;
+  }
+  
+  .users-table .action-btn:hover {
+    opacity: 0.8;
+  }
+  
+  .users-table .edit-btn {
+    background-color: #007bff; /* Синій */
+    color: white;
+  }
+  
+  .users-table .delete-btn {
+    background-color: #dc3545; /* Червоний */
+    color: white;
+  }
+  
+  .no-users-message {
+    text-align: center !important;
+    padding: 20px !important;
+    color: #777;
+    font-style: italic;
+  }
